@@ -1,0 +1,73 @@
+---
+name: "Update flannel version" 
+
+sources:
+ flannel:
+   name: Get flannel version
+   kind: githubrelease
+   spec:
+     owner: rancher
+     repository: image-build-flannel
+     token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+     username: '{{ requiredEnv "UPDATECLI_GITHUB_ACTOR" }}'
+     typefilter:
+       latest: true
+       release: true
+       draft: false
+       prerelease: false
+     versionfilter:
+       kind: regex
+       # pattern accepts any semver constraint
+       pattern: "v[0-9]+.[0-9]+.[0-9]+-build[0-9]+"
+ calico:
+   name: Get calico version
+   kind: githubrelease
+   spec:
+     owner: rancher
+     repository: image-build-calico
+     token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+     username: '{{ requiredEnv "UPDATECLI_GITHUB_ACTOR" }}'
+     typefilter:
+       latest: true
+       release: true
+       draft: false
+       prerelease: false
+     versionfilter:
+       kind: regex
+       # pattern accepts any semver constraint
+       pattern: "v[0-9]+.[0-9]+.[0-9]+-build[0-9]+"
+
+targets:
+  flannelImage:
+    name: "Bump to latest flannel version on the chart"
+    kind: yaml
+    scmid: default
+    sourceid: flannel
+    spec:
+      file: "packages/rke2-canal/charts/values.yaml"
+      key: "$.flannel.image.tag"
+      value: '{{ source "flannel" }}' 
+
+scms:
+  default:
+    kind: github
+    spec:
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      username: '{{ requiredEnv "UPDATECLI_GITHUB_ACTOR" }}'
+      user: '{{ .github.username }}'
+      email: '{{ .github.email }}'
+      owner: '{{ .github.owner }}'
+      repository: '{{ .github.repository }}'
+      branch: '{{ .github.branch }}'
+      
+actions:
+    default:
+        title: 'Bump flannel version to {{ source "flannel" }}'
+        kind: github/pullrequest
+        spec:
+            automerge: false
+            labels:
+                - chore
+                - skip-changelog
+                - status/auto-created 
+        scmid: default
