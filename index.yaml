@@ -1007,6 +1007,23 @@ entries:
   - annotations:
       catalog.cattle.io/namespace: tigera-operator
     apiVersion: v2
+    appVersion: v3.27.2
+    created: "2024-03-25T16:16:02.335095665Z"
+    description: Installs the Tigera operator for Calico
+    digest: 1b50b801ef3a243c882a17e37f5e282c9c69c685f99f6c74fad1b4a2834cad95
+    home: https://projectcalico.docs.tigera.io/about/about-calico
+    icon: https://projectcalico.docs.tigera.io/images/felix_icon.png
+    name: rke2-calico
+    sources:
+    - https://github.com/projectcalico/calico/tree/master/calico/_includes/charts/tigera-operator
+    - https://github.com/tigera/operator
+    - https://github.com/projectcalico/calico
+    urls:
+    - assets/rke2-calico/rke2-calico-v3.27.200.tgz
+    version: v3.27.200
+  - annotations:
+      catalog.cattle.io/namespace: tigera-operator
+    apiVersion: v2
     appVersion: v3.27.0
     created: "2024-02-13T15:47:43.328660546Z"
     description: Installs the Tigera operator for Calico
@@ -1651,6 +1668,15 @@ entries:
     version: v3.18.1-101
   rke2-calico-crd:
   - apiVersion: v1
+    created: "2024-03-25T16:16:02.310241549Z"
+    description: Installs the CRDs for rke2-calico
+    digest: 2466a059607df0af43ab1ad9bc3f306d91563f1e6e7d1bccdf4ec55348cdc929
+    name: rke2-calico-crd
+    type: application
+    urls:
+    - assets/rke2-calico/rke2-calico-crd-v3.27.200.tgz
+    version: v3.27.200
+  - apiVersion: v1
     created: "2024-02-13T15:47:43.303193583Z"
     description: Installs the CRDs for rke2-calico
     digest: 38a3bc5c3d24c937b9feb83d10718c9bad55f802f0943dd603591bbc5e87f859
@@ -2038,6 +2064,23 @@ entries:
     - assets/rke2-calico/rke2-calico-crd-v1.0.001.tgz
     version: v1.0.001
   rke2-canal:
+  - apiVersion: v1
+    appVersion: v3.27.2
+    created: "2024-03-25T16:16:02.383226652Z"
+    description: Install Canal Network Plugin.
+    digest: 2247beaaf7f590515ccc9f692878b73fa40e15a2b7c9c7f4c666c91367429a04
+    home: https://www.projectcalico.org/
+    keywords:
+    - canal
+    maintainers:
+    - email: charts@rancher.com
+      name: Rancher Labs
+    name: rke2-canal
+    sources:
+    - https://github.com/rancher/rke2-charts
+    urls:
+    - assets/rke2-canal/rke2-canal-v3.27.2-build2024030801.tgz
+    version: v3.27.2-build2024030801
   - apiVersion: v1
     appVersion: v3.27.0
     created: "2024-02-09T16:55:52.772401631Z"
@@ -6154,6 +6197,19 @@ entries:
     version: 1.10.101-build2021022301
   rke2-flannel:
   - apiVersion: v1
+    appVersion: v0.24.4
+    created: "2024-03-25T16:16:02.588746135Z"
+    description: Install Flannel Network Plugin.
+    digest: 18d8de59d128337369aa5fc97d41ab27cff07f0a97ef31f47fb84d4dc0da5135
+    keywords:
+    - Flannel
+    name: rke2-flannel
+    sources:
+    - https://github.com/rancher/rke2-charts
+    urls:
+    - assets/rke2-flannel/rke2-flannel-v0.24.401.tgz
+    version: v0.24.401
+  - apiVersion: v1
     appVersion: v0.24.2
     created: "2024-02-02T16:33:59.381126109Z"
     description: Install Flannel Network Plugin.
@@ -8719,6 +8775,27 @@ entries:
     - assets/rke2-metrics-server/rke2-metrics-server-2.11.100-build2021022300.tgz
     version: 2.11.100-build2021022300
   rke2-multus:
+  - apiVersion: v2
+    appVersion: 4.0.2
+    created: "2024-03-25T16:16:02.700500127Z"
+    dependencies:
+    - condition: rke2-whereabouts.enabled
+      name: rke2-whereabouts
+      repository: file://./charts/rke2-whereabouts
+    description: Multus Helm chart for Kubernetes
+    digest: 3ae869ecada5e5b18891490ce44437773f5053a47466e2cd78c2e381542e98a3
+    home: https://github.com/k8snetworkplumbingwg/multus-cni
+    icon: https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/doc/images/Multus.png
+    maintainers:
+    - email: charts@rancher.com
+      name: Rancher Labs
+    name: rke2-multus
+    sources:
+    - https://github.com/intel/multus-cni
+    type: application
+    urls:
+    - assets/rke2-multus/rke2-multus-v4.0.202.tgz
+    version: v4.0.202
   - apiVersion: v2
     appVersion: 4.0.2
     created: "2024-02-28T15:34:52.506427111Z"
