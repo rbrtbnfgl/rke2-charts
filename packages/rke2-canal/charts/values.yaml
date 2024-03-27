@@ -8,7 +8,7 @@ flannel:
   # kube-flannel image
   image:
     repository: rancher/hardened-flannel
-    tag: v0.24.2-build20240122
+    tag: v0.24.4-build20240321
   # The interface used by canal for host <-> host communication.
   # If left blank, then the interface is chosen using the node's
   # default route.
@@ -60,19 +60,19 @@ calico:
   # CNI installation image.
   cniImage:
     repository: rancher/hardened-calico
-    tag: v3.27.0-build20240206
+    tag: v3.27.2-build20240308
   # Canal node image.
   nodeImage:
     repository: rancher/hardened-calico
-    tag: v3.27.0-build20240206
+    tag: v3.27.2-build20240308
   # Flexvol Image.
   flexvolImage:
     repository: rancher/hardened-calico
-    tag: v3.27.0-build20240206
+    tag: v3.27.2-build20240308
   # kubecontroller image
   kubeControllerImage:
     repository: rancher/hardened-calico
-    tag: v3.27.0-build20240206
+    tag: v3.27.2-build20240308
   # Datastore type for canal. It can be either kuberentes or etcd.
   datastoreType: kubernetes
   # Wait for datastore to initialize.
@@ -99,6 +99,8 @@ calico:
   felixPrometheusMetricsEnabled: true
   # Disable XDP Acceleration as we do not support it with our ubi7 base image
   felixXDPEnabled: false
+  # Configure the mask that felix selects its iptables mark bits from
+  felixIptablesMarkMask: "0xffff0000"
   # Whether or not to masquerade traffic to destinations not within
   # the pod network.
   masquerade: true

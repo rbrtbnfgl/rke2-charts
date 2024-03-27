@@ -38,13 +38,17 @@ resources:
     memory: "100Mi"
 
 nodeSelector:
-  kubernetes.io/arch: amd64
+  kubernetes.io/os: linux
 
 tolerations:
   - operator: Exists
     effect: NoSchedule
 
 affinity: {}
+
+cniConf:
+  confDir: /etc/cni/net.d
+  binDir: /opt/cni/bin
 
 global:
   systemDefaultRegistry: ""
