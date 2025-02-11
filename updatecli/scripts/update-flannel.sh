@@ -3,7 +3,9 @@ set -eu
 
 source $(dirname $0)/create-issue.sh
 
+LABEL="area/cni"
 ISSUE_TITLE="Updatecli failed for flannel ${FLANNEL_VERSION}"
+CHART_VERSION=""
 trap report-error EXIT INT
 
 new_package=false
@@ -16,6 +18,9 @@ if [ -n "$CNI_PLUGINS_VERSION" ]; then
 		new_version=$(printf "%02d" $(($package_version + 1)))
 		yq -i ".packageVersion = $new_version" packages/rke2-flannel/package.yaml
 		new_package=true
+		current_flannel_version=$(sed -nr 's/^\+    tag: ('v[0-9]+.[0-9]+.[0-9]+')/\1/p' packages/rke2-flannel/generated-changes/patch/values.yaml.patch  | head -1)
+		current_app_version=$(echo "$current_flannel_version" | grep -Eo 'v[0-9]+.[0-9]+.[0-9]+')
+		CHART_VERSION="${current_app_version}${new_version}"
 	fi
 fi
 if [ -n "$FLANNEL_VERSION" ]; then
@@ -46,12 +51,14 @@ if [ -n "$FLANNEL_VERSION" ]; then
 			yq -i ".url = \"https://github.com/flannel-io/flannel/releases/download/$app_version/flannel.tgz\" |
 				.packageVersion = 00" packages/rke2-flannel/package.yaml
 			rm -fr workdir
+			CHART_VERSION="${app_version}00"
 		else
 			sed -i "s/+    tag: $current_flannel_version/+    tag: $FLANNEL_VERSION/g" packages/rke2-flannel/generated-changes/patch/values.yaml.patch
 			if [ "$new_package" = false ]; then
 				package_version=$(yq '.packageVersion' packages/rke2-flannel/package.yaml)
 				new_version=$(printf "%02d" $(($package_version + 1)))
 				yq -i ".packageVersion = $new_version" packages/rke2-flannel/package.yaml
+				CHART_VERSION="${current_app_version}${new_version}"
 			fi
 		fi
 		GOCACHE='/home/runner/.cache/go-build' GOPATH='/home/runner/go' PACKAGE='rke2-flannel' make prepare
@@ -59,4 +66,8 @@ if [ -n "$FLANNEL_VERSION" ]; then
 		GOCACHE='/home/runner/.cache/go-build' GOPATH='/home/runner/go' PACKAGE='rke2-flannel' make patch
 		make clean
 	fi
+fi
+if [ -n "$CHART_VERSION" ]; then
+	ISSUE_TITLE="Update Flannel to ${CHART_VERSION}"
+	create_rke2_issue
 fi

@@ -2,6 +2,7 @@
 
 TARGET_REPOSITORY="rancher/rke2"
 BODY="Url of the failed run: ${UPDATECLI_GITHUB_WORKFLOW_URL}"
+LABEL=""
 
 report-error() {
     exit_code=$?
@@ -26,4 +27,24 @@ report-error() {
     exit $exit_code
 }
 
-export -f report-error 
+create_rke2_issue() {
+    trap - EXIT INT
+
+    #check if issue already exists
+    issues=$(gh issue list -R ${TARGET_REPOSITORY} \
+                --search "is:open ${ISSUE_TITLE}" \
+                --app rke2-issues-updatecli --json number --jq ".[].number" | wc -l)
+
+    if [[ $issues = 0 ]]; then
+        echo "Creating issue for: ${ISSUE_TITLE}"
+        gh issue create -R ${TARGET_REPOSITORY} \
+           --title "${ISSUE_TITLE}" \
+	   --label "${LABEL}" \
+           --body "${ISSUE_TITLE}"
+    else
+        echo "Issue already exists for: ${ISSUE_TITLE}"
+    fi
+}
+
+export -f report-error
+export -f create_rke2_issue

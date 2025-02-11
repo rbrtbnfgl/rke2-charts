@@ -3,7 +3,9 @@ set -eu
 
 source $(dirname $0)/create-issue.sh
 
+LABEL="area/cni"
 ISSUE_TITLE="Updatecli failed for canal ${CALICO_VERSION} / ${FLANNEL_VERSION}" 
+CHART_VERSION=""
 trap report-error EXIT INT
 
 if [ -n "$FLANNEL_VERSION" ]; then
@@ -14,6 +16,8 @@ if [ -n "$FLANNEL_VERSION" ]; then
 		package_version=$(yq '.packageVersion' packages/rke2-canal/package.yaml)
 		new_version=$(printf "%02d" $(($package_version + 1)))
 		yq -i ".packageVersion = $new_version" packages/rke2-canal/package.yaml
+		current_calico_version=$(yq '.calico.cniImage.tag' packages/rke2-canal/charts/values.yaml)
+		CHART_VERSION="${current_calico_version}${new_version}"
 	fi
 fi
 if [ -n "$CALICO_VERSION" ]; then
@@ -28,5 +32,10 @@ if [ -n "$CALICO_VERSION" ]; then
 		yq -i ".version = \"$CALICO_VERSION\" |
 			.appVersion = \"$app_version\"" packages/rke2-canal/charts/Chart.yaml
 		yq -i ".packageVersion = 00" packages/rke2-canal/package.yaml
+		CHART_VERSION="${CALICO_VERSION}00"
 	fi
+fi
+if [ -n "$CHART_VERSION" ]; then
+	ISSUE_TITLE="Update Canal to ${CHART_VERSION}"
+	create_rke2_issue
 fi

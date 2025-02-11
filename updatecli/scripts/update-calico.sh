@@ -3,6 +3,7 @@ set -eu
 
 source $(dirname $0)/create-issue.sh
 
+LABEL="area/cni"
 ISSUE_TITLE="Updatecli failed for calico ${CALICO_VERSION}" 
 trap report-error EXIT INT
 
@@ -26,5 +27,7 @@ if [ -n "$CALICO_VERSION" ]; then
 		find packages/rke2-calico/charts-crd -name '*.orig' -delete
 		GOCACHE='/home/runner/.cache/go-build' GOPATH='/home/runner/go' PACKAGE='rke2-calico' make patch
 		make clean
+		ISSUE_TITLE="Update Calico to ${CALICO_VERSION}00"
+		create_rke2_issue
 	fi
 fi

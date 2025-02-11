@@ -3,6 +3,7 @@ set -eu
 
 source $(dirname $0)/create-issue.sh
 
+LABEL="area/cni"
 ISSUE_TITLE="Updatecli failed for whereabouts ${WHEREABOUTS_VERSION}"
 trap report-error EXIT INT
 
@@ -29,5 +30,9 @@ if [ -n "$WHEREABOUTS_VERSION" ]; then
 			multus_new_version=$(printf "%02d" $(($multus_package_version + 1)))
 			yq -i ".packageVersion = $multus_new_version" packages/rke2-multus/package.yaml
 		fi
+		current_multus_version=$(yq '.image.tag' packages/rke2-multus/charts/values.yaml)
+		current_multus_app_version=$(echo "$current_multus_version" | grep -Eo '^v*[0-9]+.[0-9]+.[0-9]+')
+		ISSUE_TITLE="Update Multus to ${current_multus_app_version}${multus_new_version}"
+		create_rke2_issue
 	fi
 fi

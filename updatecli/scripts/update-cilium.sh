@@ -3,7 +3,9 @@ set -eu
 
 source $(dirname $0)/create-issue.sh
 
-ISSUE_TITLE="Updatecli failed for cilium ${CILIUM_VERSION}" 
+LABEL="area/cni"
+ISSUE_TITLE="Updatecli failed for cilium ${CILIUM_VERSION}"
+CHART_VERSION=""
 trap report-error EXIT INT
 
 if [ -n "$CNI_PLUGINS_VERSION" ]; then
@@ -15,6 +17,8 @@ if [ -n "$CNI_PLUGINS_VERSION" ]; then
 		package_version=$(yq '.packageVersion' packages/rke2-cilium/package.yaml)
 		new_version=$(printf "%02d" $(($package_version + 1)))
 		yq -i ".packageVersion = $new_version" packages/rke2-cilium/package.yaml
+		current_cilium_version=$(sed -nr 's/^\ version: ('[0-9]+.[0-9]+.[0-9]+')/\1/p' packages/rke2-cilium/generated-changes/patch/Chart.yaml.patch)
+		CHART_VERSION="${current_cilium_version}${new_version}"
 	fi
 fi
 if [ -n "$CILIUM_VERSION" ]; then
@@ -77,5 +81,10 @@ if [ -n "$CILIUM_VERSION" ]; then
 		find packages/rke2-cilium/charts -name '*.orig' -delete 
 		GOCACHE='/home/runner/.cache/go-build' GOPATH='/home/runner/go' PACKAGE='rke2-cilium' make patch
 		make clean
+		CHART_VERSION="${CILIUM_VERSION}00"
 	fi
+fi
+if [ -n "$CHART_VERSION" ]; then
+	ISSUE_TITLE="Update Cilium to ${CHART_VERSION}"
+	create_rke2_issue
 fi
